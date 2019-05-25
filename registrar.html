@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Registro</title>
+
+<style>	
+	table{
+		text-align: center;
+		border: 5px solid black;
+		padding-bottom: 10px;
+		width: 30%;
+		margin: auto;
+		background-color: grey;
+	}
+	
+	img{
+		position: relative;
+		left:45%;
+		width:10%;
+		height:10%;
+	}
+	
+	#contenedorBotones{
+		position: relative;
+		left: 28%;
+	}
+	
+	#mensajeErrorContra, #mensajeErrorUsuario{
+		position: relative;
+		color: red;
+		font-weight: bold;
+		font-size: 1.2em;
+		background-color: black;
+	}
+	
+	#mensajeErrorContra{
+		left:41%;
+		width: 19.1%;
+	}	
+	
+	#mensajeErrorUsuario{
+		left:44%;
+		width: 13.5%;
+	}	
+	
+	#mensajeCreado{
+		position: relative;
+		left:42%;
+		color: green;
+		font-weight: bold;
+		font-size: 1.2em;
+		background-color: black;
+		width: 17%;
+	}
+	
+	body{
+		 background-image: url("imagenes/tierra.jpg");
+	}
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<script>
+	function verificar(e){
+		e.preventDefault();
+		$("#mensajeErrorUsuario").hide();
+		var contra1 = $("#contra1").val();
+		var contra2 = $("#contra2").val();
+		if(contra1 != contra2)
+			$("#mensajeErrorContra").hide().fadeIn(500);		
+		else{ 
+			$("#mensajeErrorContra").hide();
+			var url = "http://localhost:8090/lionking/insertarUsuario.php";
+			var datos = {nomUsuario: $("#nomUsuario").val(),
+					    password: $("#contra1").val(),
+						nombre: $("#nombre").val(),
+						apellido: $("#apellido").val()
+					   };
+			$.post(url, datos, function(data, status){
+				if(data == "1"){
+					$("#mensajeCreado").hide().fadeIn(500);
+					setTimeout(function(){ location.href = "http://localhost:8090/lionking/index.html"; }, 1000);
+				}
+				else
+					$("#mensajeErrorUsuario").hide().fadeIn(500);	
+			});				
+		}
+		return false;
+	}
+	
+	$(document).ready(function(e){
+		$("form").submit(verificar);
+	});
+</script>
+<body>
+	<img src="imagenes/gusanito.png"></img>
+	<div id="mensajeCreado" hidden>Usuario creado con éxito</div>
+	<form name="formulario">
+		<table>
+			<tr>
+				<td>Nombre</td>
+				<td><input type="text" name="nombre" id="nombre" required></input></td>
+			</tr>
+			<tr>
+				<td>Apellido</td>
+				<td><input type="text" name="apellido" id="apellido" required></input></td>
+			</tr>
+			<tr>
+				<td>Usuario</td>
+				<td><input type="text" name="nomUsuario" id="nomUsuario" required></input></td>
+			</tr>
+			<tr>
+				<td>Contraseña</td>
+				<td><input type="password" name="password" id="contra1" required></input></td>
+			</tr>
+			<tr>
+				<td>Repita contraseña</td>
+				<td><input type="password" name="password" id="contra2" required></input></td>
+			</tr>
+			<tr>			
+				<td id="contenedorBotones">
+					<button onclick="window.location='index.html';">Volver</button>
+					<input type="submit" value="Aceptar"></input>
+				</td>
+			</tr>
+		</table>
+	</form>
+	<div id="mensajeErrorUsuario" hidden>Usuario ya existente</div>
+	<div id="mensajeErrorContra" hidden>Las contraseñas no coinciden</div>
+</body>
+</html>

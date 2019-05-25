@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Lion King</title>
+
+<style>	
+	table{
+		text-align: center;
+		border: 5px solid black;
+		padding-bottom: 10px;
+		width: 30%;
+		margin: auto;
+		background-color: grey;
+	}
+	
+	#contenedorBoton{
+		position: relative;
+		left: 34%;
+	}
+	
+	img{
+		position: relative;
+		left:45%;
+		width:10%;
+		height:10%;
+	}
+	
+	a{
+		position: relative;
+		left: 46.6%;
+		color: white; 
+		font-size: 1.2em;
+		background-color: black;
+	}
+	
+	#mensajeError{
+		position: relative;
+		left:38.5%;
+		color: red;
+		font-weight: bold;
+		font-size: 1.2em;
+		background-color: black;
+		width: 23%;
+	}	
+	
+	body{
+		 background-image: url("imagenes/tierra.jpg");
+	}
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+</head>
+ <script>
+	$(document).ready(function(e){	
+		$("form").submit(function(event){
+			event.preventDefault();
+			var url = "http://localhost:8090/lionking/verificarUsuario.php?nomUsuario="+$("#nom").val()+"&password="+$("#contra").val();
+			$.get(url, function(data, status){
+				if(data != "0"){
+					location.href = "http://localhost:8090/lionking/jueguito.html?usuario=" + $("#nom").val() +"&nom=" + data;
+				}
+				else{
+					$("#mensajeError").hide().fadeIn(500);
+				}
+			});				
+		});
+		
+		$("a").hover(function(e){
+			$("a").css("color", "green");
+		}, function(e){
+			$("a").css("color", "white");
+		});
+	});
+ </script>
+ 
+<body onload="$('form').hide().slideDown(600);">
+	<img src="imagenes/gusanito.png"></img>
+	<div id="mensajeError" hidden>Usuario y/o contraseña incorrectos</div>
+	<form name="formulario">
+		<table>
+			<tr>
+				<td>Usuario</td>
+				<td><input type="text" name="nomUsuario" id="nom" required></input></td>
+			</tr>
+			<tr>
+				<td>Contraseña</td>
+				<td><input type="password" name="password" id="contra" required></input></td>
+			</tr>
+			<tr>
+				<td id="contenedorBoton"><input type="submit" value="Ingresar"></input></td>
+			</tr>
+		</table>
+	</form>
+	<a href="registrar.html">Regístrate!</a>
+</body>
+</html>

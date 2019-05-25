@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Alto juego</title>
+<style>
+	body{
+		 background-image: url("imagenes/tierra.jpg");
+	}
+	
+	.pasto{
+		width: 135px;
+		height: 97px;
+	}
+	
+	#dificultad, #nombramiento{
+		position: absolute;
+		right: 31%;
+		margin: 0px;
+		top: 12%;
+		background-color: grey;
+		border-radius: 15px;
+		padding: 130px;
+		text-align: center;
+		background-image: radial-gradient(white, grey, white);
+	}
+	
+	#nombreJugador{
+		border: 2px black ;
+		border-radius: 15px;
+		width: 200px;
+		height: 20px;
+	}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="libreria.js"></script>
+
+<script>
+		
+		var nombre;
+		var maximoIntentos = 20;
+		var numIntento = 1;
+		var dificultad = "media";
+		
+		function seleccionarDificultad(){ //comienza el juego
+			$("#sesionDificultad").hide();
+			
+			if(dificultad == "facil"){
+				maximoIntentos = 30;
+			} else if(dificultad == "media"){
+				maximoIntentos = 20;
+			} else{
+				maximoIntentos = 10;
+			}
+			document.getElementById("intentos").innerHTML = "Intentos restantes: " + (maximoIntentos - numIntento + 1);
+			$("#juego").hide().fadeIn(3000);
+		}
+		
+		function cambiarDificultad(inp){
+			dificultad = inp.value;
+		}
+		
+		function cerrarSesion(){
+			setCookie("usuario", "", "/lionking");
+			location.href = "http://localhost:8090/lionking/index.html";
+			exit();
+		}
+		$(document).ready(function(){
+			var cookieSesion = getCookie("usuario");
+			if(cookieSesion != getParameterByName("usuario")){
+				location.href = "http://localhost:8090/lionking/error.html";
+				exit();
+			}
+			
+			$("#dificultad").hide().fadeIn(500);
+			nombre = getParameterByName("nom");
+			var pastitos = $(".pasto"); 
+			var posicionGusano = Math.floor(Math.random() * pastitos.length); //retorna la posicion del elemento pasto donde está el gusano
+			var pastoConGusano = pastitos[posicionGusano];
+
+			pastitos.each(function(){
+				$(this).mouseover(function(){ $(this).css("filter","sepia(60%)"); });
+				$(this).mouseout(function(){ $(this).css("filter","none"); });
+			});
+			
+			function reiniciar(){
+				pastitos.each(function(){
+					$(this).mouseover(function(){ $(this).css("filter","sepia(60%)"); });
+					$(this).mouseout(function(){ $(this).css("filter","none"); });
+				});
+				numIntento = 1;
+				for(var i=0; i<pastitos.length; i++){
+					unPasto = pastitos[i];
+					unPasto.addEventListener("click", reemplazarPasto, false);
+					unPasto.src = "imagenes/pastito.gif";
+				}
+				posicionGusano = Math.floor(Math.random() * pastitos.length);
+				pastoConGusano = pastitos[posicionGusano];
+				document.getElementById("intentos").innerHTML = "Intentos restantes: " + (maximoIntentos - numIntento + 1);
+			}
+			
+			function volverADificultad(){
+				$("#juego").hide();
+				reiniciar();
+				$("#sesionDificultad").hide().fadeIn(500);
+			}
+			
+			document.getElementById("volviendoADificultad").addEventListener("click", volverADificultad, false);
+			
+			function reemplazarPasto(event){
+				var pasto = event.target;
+				var selectorPastoId = "#" + pasto.id;
+				$(selectorPastoId).css("filter","none");
+				if(numIntento < maximoIntentos){
+					if(pasto.id == pastoConGusano.id){
+						pasto.src = "imagenes/gusanito.png";
+						setTimeout(function(){alert("Has ganado! Sos re crack " + nombre + "!");}, 200);
+						setTimeout(reiniciar, 1000);
+					}
+					else{
+						pasto.src = "imagenes/nope.jpg";
+						numIntento++;
+						document.getElementById("intentos").innerHTML = "Intentos restantes: " + (maximoIntentos - numIntento + 1);
+					}
+					pasto.removeEventListener("click", reemplazarPasto);
+					$(selectorPastoId).mouseover(function(){ $(this).css("filter","none"); });
+				}
+				else{
+					pasto.src = "imagenes/nope.jpg";
+					pastoConGusano.src = "imagenes/gusanito.png";
+					setTimeout(function(){alert("El gusanito se ha escapado loco! " + nombre + " sos medio salame!!!!");}, 200);	
+					setTimeout(reiniciar, 1000);
+				}
+			}
+			
+			for(var i=0, unPasto; i<pastitos.length; i++){
+				unPasto = pastitos[i];
+				unPasto.addEventListener("click", reemplazarPasto, false);
+			}
+			
+		});
+</script>
+</head>
+
+<body>	
+	<div id="sesionDificultad">
+	<button style="height: 30px; margin-left: 10px; position:relative; left: 90%;" onclick="cerrarSesion();">Cerrar sesión</button>
+	<div id="dificultad">
+		<p style="font-size: 20px;">Seleccione el nivel de dificultad</p>
+		<p>
+			Fácil<input type="radio" name="dificulty" value="facil" onclick="cambiarDificultad(this)"></input>
+		</p>
+		<p>
+			Medio<input type="radio" name="dificulty" value="media" checked  onclick="cambiarDificultad(this)"></input>
+		</p>
+		<p>
+			Difícil<input type="radio" name="dificulty" value="dificil"  onclick="cambiarDificultad(this)"></input>
+		</p>
+		<button onclick="seleccionarDificultad()">Aceptar</button>
+	</div>
+	</div>
+	
+	<div id="juego" hidden>
+	<div id="cabecera" style="display: flex;">
+		<h3 style="margin-top: 0px; margin-bottom: 5px; color: white; background-color: black; width: 31%;">
+			Encuentra al gusanito antes de que se escape!!!
+		</h3>
+		<button id="volviendoADificultad" style="height: 22px; margin-left: 10px;">Volver</button>
+		<button style="height: 22px; margin-left: 10px;" onclick="cerrarSesion();">Cerrar sesión</button>
+		<h4 style="margin-top: 0px; margin-bottom: 5px; color: white; background-color: black; width: 12%; position: absolute; left: 87%;" id="intentos">	
+		</h4>
+	</div>
+	<table>
+		<tr>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto1"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto2"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto3"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto4"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto5"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto6"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto7"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto8"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto9"></img></td>
+		</tr>
+		<tr>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto10"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto11"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto12"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto13"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto14"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto15"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto16"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto17"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto18"></img></td>
+		</tr>
+		<tr>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto19"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto20"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto21"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto22"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto23"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto24"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto25"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto26"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto27"></img></td>
+		</tr>
+		<tr>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto28"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto29"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto30"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto31"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto32"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto33"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto34"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto35"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto36"></img></td>	
+		</tr>
+		<tr>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto37"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto38"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto39"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto40"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto41"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto42"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto43"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto44"></img></td>
+			<td><img src="imagenes/pastito.gif" class="pasto" id="pasto45"></img></td>	
+		</tr>
+	</table>
+	</div>
+</body>
+</html>
