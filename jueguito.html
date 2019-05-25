@@ -33,7 +33,7 @@
 	}
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="libreria.js"></script>
+<script src="../easingPlugin.js"></script>
 
 <script>
 		
@@ -41,9 +41,20 @@
 		var maximoIntentos = 20;
 		var numIntento = 1;
 		var dificultad = "media";
+			
+		function nombrarJugador(){
+			nombre = document.nombreJugadorForm.nombre.value;
+			$("#nombramiento").hide();
+			$("#dificultad").hide().slideDown(800);
+		}
+		
+		function volverANombramiento(){
+			$("#dificultad").hide();
+			$("#nombramiento").css({"right": "-500px", "opacity":"0.3", "display":"block"}).animate({ right: "31%",opacity:"1" }, 1000);
+		}
 		
 		function seleccionarDificultad(){ //comienza el juego
-			$("#sesionDificultad").hide();
+			$("#dificultad").hide();
 			
 			if(dificultad == "facil"){
 				maximoIntentos = 30;
@@ -59,21 +70,8 @@
 		function cambiarDificultad(inp){
 			dificultad = inp.value;
 		}
-		
-		function cerrarSesion(){
-			setCookie("usuario", "", "/lionking");
-			location.href = "http://localhost:8090/lionking/index.html";
-			exit();
-		}
 		$(document).ready(function(){
-			var cookieSesion = getCookie("usuario");
-			if(cookieSesion != getParameterByName("usuario")){
-				location.href = "http://localhost:8090/lionking/error.html";
-				exit();
-			}
-			
-			$("#dificultad").hide().fadeIn(500);
-			nombre = getParameterByName("nom");
+			$("#nombramiento").css({"right": "-500px","opacity":"0.3"}).animate({ right: "31%",opacity:"1" }, 1000);
 			var pastitos = $(".pasto"); 
 			var posicionGusano = Math.floor(Math.random() * pastitos.length); //retorna la posicion del elemento pasto donde está el gusano
 			var pastoConGusano = pastitos[posicionGusano];
@@ -102,7 +100,7 @@
 			function volverADificultad(){
 				$("#juego").hide();
 				reiniciar();
-				$("#sesionDificultad").hide().fadeIn(500);
+				$("#dificultad").hide().slideDown(800);
 			}
 			
 			document.getElementById("volviendoADificultad").addEventListener("click", volverADificultad, false);
@@ -142,10 +140,16 @@
 </script>
 </head>
 
-<body>	
-	<div id="sesionDificultad">
-	<button style="height: 30px; margin-left: 10px; position:relative; left: 90%;" onclick="cerrarSesion();">Cerrar sesión</button>
-	<div id="dificultad">
+<body>
+	<div id="nombramiento">
+	<form action="jueguito.html" method="post" name="nombreJugadorForm">
+		<p style="font-size: 20px;">Ingrese su nombre por favor</p>
+		<input type="text" name="nombre" id="nombreJugador" placeholder="nombre aquí"></input><br/><br/>
+		<input type="button" value="Aceptar" onclick="nombrarJugador()"></input>
+	</form>
+	</div>
+	
+	<div id="dificultad" hidden>
 		<p style="font-size: 20px;">Seleccione el nivel de dificultad</p>
 		<p>
 			Fácil<input type="radio" name="dificulty" value="facil" onclick="cambiarDificultad(this)"></input>
@@ -156,8 +160,8 @@
 		<p>
 			Difícil<input type="radio" name="dificulty" value="dificil"  onclick="cambiarDificultad(this)"></input>
 		</p>
+		<button onclick="volverANombramiento()">Volver</button>
 		<button onclick="seleccionarDificultad()">Aceptar</button>
-	</div>
 	</div>
 	
 	<div id="juego" hidden>
@@ -166,7 +170,6 @@
 			Encuentra al gusanito antes de que se escape!!!
 		</h3>
 		<button id="volviendoADificultad" style="height: 22px; margin-left: 10px;">Volver</button>
-		<button style="height: 22px; margin-left: 10px;" onclick="cerrarSesion();">Cerrar sesión</button>
 		<h4 style="margin-top: 0px; margin-bottom: 5px; color: white; background-color: black; width: 12%; position: absolute; left: 87%;" id="intentos">	
 		</h4>
 	</div>
